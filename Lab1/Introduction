@@ -1,0 +1,51 @@
+//// Running the mongod Instance.	////
+
+$ mkdir /Users/spandanbrahmbhatt/Documents/mongodbData						//Create data dir
+$ chmod 777 /Users/spandanbrahmbhatt/Documents/mongodbData/					//Change permission
+$ ./mongod --dbpath /Users/spandanbrahmbhatt/Documents/mongodbData/			//Start mongo Server
+$ ./mongod 																	//Start mongo Shell
+
+-------------------------------------------------------------------------------------------------------
+
+///Hello World to MongoDB 			////
+
+1. Introduction to Database and collection.
+
+> show dbs
+> use HelloWorld															//Change DB. HelloWorld is the DB name.
+> db.stats()																//Check Stats for the Database
+> db.users.stats()															//Check Stats for the Collection.
+
+
+What is Database?
+What is collection?
+What is Document?
+
+
+**********************************
+Keep in Mind :
+
+>The field name _id is reserved for use as a primary key; its value must be unique in the collection, is immutable, and may be of any 			type other than an array.
+>The field names cannot start with the dollar sign ($) character.
+>The field names cannot contain the dot (.) character.
+>The field names cannot contain the null character.
+>The _id field is always the first field in the document.
+
+> BSON Document maximum size is 16 MB
+**********************************
+
+
+Sample Document :
+
+{
+     item: "ABC1",
+     details: {
+        model: "14Q3",
+        manufacturer: "XYZ Company"
+     },
+     stock: [ { size: "S", qty: 25 }, { size: "M", qty: 50 } ],
+     category: "clothing"
+}
+
+Basic Syntax : db.collectionName.function({parameter:value})
+

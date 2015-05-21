@@ -1,0 +1,86 @@
+***Insert Documents***
+
+1. Insert a document into a collection : 
+
+> db.users.insert({name:"Spandan"})											//Insert a demo Document
+> db.users.insert([{name: "Nick Fury"},{name: "Bruce Banner"}])				//Insert multiple Document
+> db.users.save({name: "Huan"})												//Save a Document. Use save when providing ID explicitly.
+> db.users.insert({name : {first : "Tony", last : "Stark"}, birth: new Date('Jun 23, 1912'), contribs: [ "Avengers", "Defenders", "Illuminati"], views : NumberLong(1250000)})
+> db.inventory.insert(
+   {
+     item: "ABC1",
+     details: {
+        model: "14Q3",
+        manufacturer: "XYZ Company"
+     },
+     stock: [ { size: "S", qty: 25 }, { size: "M", qty: 50 } ],
+     category: "clothing"
+   }
+)
+
+2.Insert an Array of Documents
+
+> var mydocuments =
+    [
+      {
+        item: "ABC2",
+        details: { model: "14Q3", manufacturer: "M1 Corporation" },
+        stock: [ { size: "M", qty: 50 } ],
+        category: "clothing",
+        price : 10
+      },
+      {
+        item: "MNO2",
+        details: { model: "14Q3", manufacturer: "ABC Company" },
+        stock: [ { size: "S", qty: 5 }, { size: "M", qty: 5 }, { size: "L", qty: 1 } ],
+        category: "clothing",
+        price : 34
+      },
+      {
+        item: "IJK2",
+        details: { model: "14Q2", manufacturer: "M5 Corporation" },
+        stock: [ { size: "S", qty: 5 }, { size: "L", qty: 1 } ],
+        category: "houseware",
+        price : 64
+      }
+    ];
+> db.inventory.insert( mydocuments );
+
+
+-------------------------------------------------------------------------------------------------------
+
+****Querying a Document***
+
+> db.users.find()															//Select All Documents in a Collection
+> db.users.find({name:"Spandan"})											//Specify Equality Condition
+> db.inventory.find( { category: 'clothing', "stock.qty": { $lt: 3 } } )	//Specify AND Conditions
+																			//Specify OR Conditions
+>db.inventory.find(															
+   {
+     $or: [ { qty: { $gt: 100 } }, { price: { $lt: 9.95 } } ]
+   }
+)
+> db.inventory.find(
+   {
+     category: 'clothing',
+     $or: [ { qty: { $gt: 100 } }, { price: { $lt: 9.95 } } ]
+   }
+)
+> db.users.find({"education.college": "IIN"})								//Quotes required for key - "education.college"
+
+> var doc = [
+			{ _id: 5, type: "food", item: "aaa", ratings: [ 5, 8, 9 ] },
+			{ _id: 6, type: "food", item: "bbb", ratings: [ 5, 9 ] },
+			{ _id: 7, type: "food", item: "ccc", ratings: [ 9, 5, 8 ] }
+		   ];
+> db.inventory.insert(doc)		 
+> db.inventory.find( { ratings: 5 } )											//Match an Array Element
+> db.inventory.find( { 'ratings.0': 5 } )										//Match a Specific Element of an Array
+> db.inventory.find( { ratings: { $elemMatch: { $gt: 5, $lt: 9 } } } )			//Single Element Satisfies the Criteria - at least one
+> db.inventory.find( { ratings: { $gt: 5, $lt: 9 } } )							//Combination of Elements Satisfies the Criteria
+
+> db.users.find({name : "Spandan"}, {name:1})
+> db.users.find({name : "Spandan"}, {name:1, _id : 0})
+Except for excluding the _id field in inclusive projections, you cannot mix exclusive and inclusive projections.
+
+

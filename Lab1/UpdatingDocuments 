@@ -1,0 +1,94 @@
+Updating Documents :
+
+Syntax : db.collectionName.update({queryToFindDoc}, {$set: {newParameter:value}})
+Syntax : db.collectionName.find({Query Criteria}.{Projection})
+
+Note : Update only works when a match is found. When Upsert is used, MongoDB tries to do a update, but if no Doc is
+found it does an insert. Upsert = Update or else
+
+
+> db.books.insert({
+  _id: 1,
+  item: "TBD",
+  stock: 0,
+  info: { publisher: "1111", pages: 430 },
+  tags: [ "technology", "computer" ],
+  ratings: [ { by: "ijk", rating: 4 }, { by: "lmn", rating: 5 } ],
+  reorder: false
+})
+> db.books.update(
+   { _id: 1 },
+   {
+     $inc: { stock: 5 },
+     $set: {
+       item: "ABC123",
+       "info.publisher": "2222",
+       tags: [ "software" ],
+       "ratings.1": { by: "xyz", rating: 3 }
+     }
+   }
+)
+>{
+  "_id" : 1,
+  "item" : "ABC123",
+  "stock" : 5,
+  "info" : { "publisher" : "2222", "pages" : 430 },
+  "tags" : [ "software" ],
+  "ratings" : [ { "by" : "ijk", "rating" : 4 }, { "by" : "xyz", "rating" : 3 } ],
+  "reorder" : false
+}
+db.books.update(															//Replaces the whole Document
+   { item: "XYZ123" },
+   {
+     item: "XYZ123",
+     stock: 10,
+     info: { publisher: "2255", pages: 150 },
+     tags: [ "baking", "cooking" ]
+   }
+)
+																			//$set creates a field if it doesnt exist
+> db.users.update({name: "Spandan"}, {$set: {University: "NEU"}})			//Use Set to update any value.
+> db.users.update({name: "Spandan"}, {$unset: {University: 1}})				//Removes a field.
+> db.users.update({name:"Spandan"}, {$set : { education : { college : ["IIN", "IIPM"], courses : ["Big Data","NLP", "ML"]}}})
+> db.users.update({name:"Huan"}, {$set : { education : { college : ["CIN", "CIPM"], courses : ["NLP", "ML"]}}})
+																			//Update an embedded field
+> db.inventory.update(
+  { item: "ABC1" },
+  { $set: { "details.model": "14Q2" } }
+)
+
+																			//Update multiple documents
+db.inventory.update(
+   { category: "clothing" },
+   {
+     $set: { category: "apparel" },
+     $currentDate: { lastModified: true }
+   },
+   { multi: true }
+)
+																			// Upsert a Document
+db.inventory.update(
+   { item: "TBD1" },
+   {
+     item: "TBD1",
+     details: { "model" : "14Q4", "manufacturer" : "ABC Company" },
+     stock: [ { "size" : "S", "qty" : 25 } ],
+     category: "houseware"
+   },
+   { upsert: true }
+)
+																			//Upsert with $set
+db.inventory.update(
+   { item: "TBD2" },
+   {
+     $set: {
+        details: { "model" : "14Q3", "manufacturer" : "IJK Co." },
+        category: "houseware"
+     }
+   },
+   { upsert: true }
+)
+
+
+//Update Operators
+http://docs.mongodb.org/manual/reference/operator/update/

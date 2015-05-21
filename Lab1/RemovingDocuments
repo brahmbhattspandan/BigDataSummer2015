@@ -1,0 +1,33 @@
+Removing Documents 
+
+db.users.remove()															//Remove All the documents
+db.users.remove({"name":"Spandan"})											//Remove Documents that Match a Condition
+db.users.remove({"name":"Spandan"},true)									//Removes the first found Document only
+db.users.drop()																//Drop the whole collection
+
+-------------------------------------------------------------------------------------------------------
+
+//// Creating Indexes
+
+> for(i=0; i<2000; i++) {
+         db.numbers.save({num: i});
+}
+> db.numbers.find({num:500})
+> db.numbers.find({num: {"$gt" : 1990}})
+> db.numbers.find({num: {"$gt" : 1990, "$lt" : 1996}})
+> db.numbers.find( {num: {"$gt": 1995 }} ).explain()
+
+Syntax : db.collection.ensureIndex({field: 1})								// To Create Index
+
+> db.numbers.ensureIndex({num: 1})
+> db.numbers.getIndexes()													//View Indexes
+> db.numbers.find( {num: {"$gt": 1995 }} ).explain()
+
+
+-------------------------------------------------------------------------------------------------------
+
+//// Other Useful Function :
+
+> db.users.count()
+> db.invenory.find().limit(2)
+> db.users.findOne()

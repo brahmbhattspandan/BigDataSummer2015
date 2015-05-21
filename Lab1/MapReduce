@@ -1,0 +1,177 @@
+Map Reduce 
+
+Collection Name : Orders
+Data :
+
+{
+     cust_id: "abc123",
+     ord_date: new Date("Oct 04, 2012"),
+     status: 'A',
+     price: 25,
+     items: [ { sku: "mmm", qty: 5, price: 2.5 },
+              { sku: "nnn", qty: 5, price: 2.5 } ]
+}
+
+****Return the Total Price Per Customer****
+
+> var mapFunction1 = function() {
+                       emit(this.cust_id, this.price);
+                   };
+> var reduceFunction1 = function(keyCustId, valuesPrices) {
+                          return Array.sum(valuesPrices);
+                      };  
+>db.orders.mapReduce(
+                     mapFunction1,
+                     reduceFunction1,
+                     { out: "map_reduce_example" }
+                   )                 
+
+****Calculate Order and Total Quantity with Average Quantity Per Item****
+>var mapFunction2 = function() {
+                       for (var idx = 0; idx < this.items.length; idx++) {
+                           var key = this.items[idx].sku;
+                           var value = {
+                                         count: 1,
+                                         qty: this.items[idx].qty
+                                       };
+                           emit(key, value);
+                       }
+                    };
+>var reduceFunction2 = function(keySKU, countObjVals) {
+                     reducedVal = { count: 0, qty: 0 };
+
+                     for (var idx = 0; idx < countObjVals.length; idx++) {
+                         reducedVal.count += countObjVals[idx].count;
+                         reducedVal.qty += countObjVals[idx].qty;
+                     }
+
+                     return reducedVal;
+                  }; 
+>var finalizeFunction2 = function (key, reducedVal) {
+
+                       reducedVal.avg = reducedVal.qty/reducedVal.count;
+
+                       return reducedVal;
+
+                    }; 
+> db.orders.mapReduce( mapFunction2,
+                     reduceFunction2,
+                     {
+                       out: { merge: "map_reduce_example" },
+                       query: { ord_date:
+                                  { $gt: new Date('01/01/2012') }
+                              },
+                       finalize: finalizeFunction2
+                     }
+                   )
+
+
+**** Incremental Map Reduce ****
+
+Data :
+
+db.sessions.save( { userid: "a", ts: ISODate('2011-11-03 14:17:00'), length: 95 } );
+db.sessions.save( { userid: "b", ts: ISODate('2011-11-03 14:23:00'), length: 110 } );
+db.sessions.save( { userid: "c", ts: ISODate('2011-11-03 15:02:00'), length: 120 } );
+db.sessions.save( { userid: "d", ts: ISODate('2011-11-03 16:45:00'), length: 45 } );
+
+db.sessions.save( { userid: "a", ts: ISODate('2011-11-04 11:05:00'), length: 105 } );
+db.sessions.save( { userid: "b", ts: ISODate('2011-11-04 13:14:00'), length: 120 } );
+db.sessions.save( { userid: "c", ts: ISODate('2011-11-04 17:00:00'), length: 130 } );
+db.sessions.save( { userid: "d", ts: ISODate('2011-11-04 15:37:00'), length: 65 } );
+
+Map Reduce :
+
+> var mapFunction3 = function() {
+                      var key = this.userid;
+                      var value = {
+                                    userid: this.userid,
+                                    total_time: this.length,
+                                    count: 1,
+                                    avg_time: 0
+                                   };
+
+                      emit( key, value );
+                  }; 
+> var reduceFunction3 = function(key, values) {
+
+                        var reducedObject = {
+                                              userid: key,
+                                              total_time: 0,
+                                              count:0,
+                                              avg_time:0
+                                            };
+
+                        values.forEach( function(value) {
+                                              reducedObject.total_time += value.total_time;
+                                              reducedObject.count += value.count;
+                                        }
+                                      );
+                        return reducedObject;
+                     };                                    
+> var finalizeFunction3 = function (key, reducedValue) {
+
+                          if (reducedValue.count > 0)
+                              reducedValue.avg_time = reducedValue.total_time / reducedValue.count;
+
+                          return reducedValue;
+                       };
+> db.sessions.mapReduce( mapFunction3,
+                       reduceFunction3,
+                       {
+                         out: "session_stat",
+                         finalize: finalizeFunction3
+                       }
+                     )
+
+---- Data Added ----
+
+db.sessions.save( { userid: "a", ts: ISODate('2011-11-05 14:17:00'), length: 100 } );
+db.sessions.save( { userid: "b", ts: ISODate('2011-11-05 14:23:00'), length: 115 } );
+db.sessions.save( { userid: "c", ts: ISODate('2011-11-05 15:02:00'), length: 125 } );
+db.sessions.save( { userid: "d", ts: ISODate('2011-11-05 16:45:00'), length: 55 } );
+
+> db.sessions.mapReduce( mapFunction3,
+                       reduceFunction3,
+                       {
+                         query: { ts: { $gt: ISODate('2011-11-05 00:00:00') } },
+                         out: { reduce: "session_stat" },
+                         finalize: finalizeFunction3
+                       }
+                     );                                            
+
+
+-------------------------------------------------------------------------------------------------------
+
+head -n 100 incident.csv > small.csv
+$ mongoimport -d HelloWorld -c incident --type csv --headerline --file /Users/spandanbrahmbhatt/Downloads/small.csv
+> db.incident.count()
+> db.incident.findOne()
+
+Find Incidents Occured in a month :
+
+> var mapFunction4 = function() {
+                      var key = this.month;
+                      var value = {                                   
+                                    count: 1                                    
+                                   };
+
+                      emit( key, value );
+                  }; 
+> var reduceFunction4 = function(key, values) {
+
+                        var reducedObject = {                                              
+                                              count:0                                           
+                                            };
+
+                        values.forEach( function(value) {                                              
+                                              reducedObject.count += value.count;
+                                        }
+                                      );
+                        return reducedObject;
+                     }; 
+> db.incident.mapReduce(
+						mapFunction4,
+						reduceFunction4,
+						{out : "incidentFound"}
+						)                                        
