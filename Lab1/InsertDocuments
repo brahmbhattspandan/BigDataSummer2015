@@ -76,8 +76,8 @@
 > db.inventory.insert(doc)		 
 > db.inventory.find( { ratings: 5 } )											//Match an Array Element
 > db.inventory.find( { 'ratings.0': 5 } )										//Match a Specific Element of an Array
-> db.inventory.find( { ratings: { $elemMatch: { $gt: 5, $lt: 9 } } } )			//Single Element Satisfies the Criteria - at least one
-> db.inventory.find( { ratings: { $gt: 5, $lt: 9 } } )							//Combination of Elements Satisfies the Criteria
+> db.inventory.find( { ratings: { $elemMatch: { $gt: 5, $lt: 9 } } } )			//Combination of Elements Satisfies the Criteria
+> db.inventory.find( { ratings: { $gt: 5, $lt: 9 } } )							//Single Element Satisfies the Criteria - at least one
 
 > db.users.find({name : "Spandan"}, {name:1})
 > db.users.find({name : "Spandan"}, {name:1, _id : 0})
