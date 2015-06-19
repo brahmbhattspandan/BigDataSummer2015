@@ -1,0 +1,31 @@
+HBase Shell Commands :
+
+Material : http://www.tutorialspoint.com/hbase/
+
+To start Hbase :
+
+$ hbase shell
+
+> list															//To list all tables
+> create ‘<table name>’,’<column family>’						//To create a table
+> disable ‘emp’													//To disable a table
+> drop 'emp'													//To Drop table 
+> describe 'table name'											//To describe a table
+> alter ‘ table name ’, ‘delete’ ⇒ ‘ column family ’ 			//To delete a col family
+> scan 'employee'												//To get all data in table
+> put ’<table name>’,’row1’,’<colfamily:colname>’,’<value>’ 	//To insert data 
+> get ’<table name>’,’row1’										//To get a row
+> delete ‘<table name>’, ‘<row>’, ‘<column name >’ 				//To delete a row
+> count ‘<table name>’ 											//To count number of rows
+> truncate 'table name'											//To truncate a table
+
+
+
+create 'test1', 'cf1'
+put 'test1', '20130101#1', 'cf1:sales', '100'
+put 'test1', '20130101#2', 'cf1:sales', '110'
+put 'test1', '20130102#1', 'cf1:sales', '200'
+put 'test1', '20130102#2', 'cf1:sales', '210'
+
+create 'test2', 'cf1'
+
