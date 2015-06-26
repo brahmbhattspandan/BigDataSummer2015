@@ -1,0 +1,75 @@
+Pig Latin :
+
+1. Load : 													//To load data into variable
+		varName = Load 'path_to_file' using PigStorage('separator') as (var_name:datatype..);
+
+		divs = load 'NYSE_dividends' using PigStorage(',');
+		divs = load 'NYSE_dividends' as (exchange, symbol, date, dividends);
+
+2. Store :													//To store data into FS.
+		Store varName into 'path' using PigStorage('separator')
+		store processed into 'processed' using PigStorage(',');
+
+3. Dump :													//To view data into grunt.
+		dump processed;
+
+4. foreach :												//To loop overdata
+		newVar = foreach oldVar generate ...
+
+		gain = foreach prices generate close - open; 
+		gain2 = foreach prices generate $6 - $3;
+		in_cents = foreach divs generate dividends * 100.0 as dividend, dividends * 100.0;
+
+5. Filter :													//To filter out data.
+		newVar = filter oldVar by innerVar relOperator value;
+
+		X = FILTER A BY f3 == 3;
+
+6. Group :													//to group up data
+		newVar = group oldVar by innerVar;
+
+		grpd = group daily by stock;
+		cnt = foreach grpd generate group, COUNT(daily);
+		avg = foreach grpd generate group, AVG(daily.dividends);
+
+7. Order by :
+		
+		bydate = order daily by date;
+		bydatensymbol = order daily by date, symbol;
+		byclose = order daily by close desc, open;
+
+8. Distinct :
+		uniq = distinct daily;
+
+9. Join :
+		daily = load 'NYSE_daily' as (exchange, symbol, date, open, high, low, close, volume, adj_close);
+		divs = load 'NYSE_dividends' as (exchange, symbol, date, dividends); 
+		jnd = join daily by symbol, divs by symbol;
+
+10. Limit :
+		first10 = limit divs 10;
+
+11. User Defined Functions
+		register 'your_path_to_piggybank/piggybank.jar';
+		divs = load 'NYSE_dividends' as (exchange:chararray, symbol:chararray, date:chararray, dividends:float); 
+		backwards = foreach divs generate org.apache.pig.piggybank.evaluation.string.Reverse(symbol);
+		define reverse org.apache.pig.piggybank.evaluation.string.Reverse();
+
+
+
+
+
+Join Example :
+
+1.
+daily = load 'NYSE_daily' as (exchange, symbol, date, open, high, low, close,
+volume, adj_close);
+divs = load 'NYSE_dividends' as (exchange, symbol, date, dividends); jnd = join daily by symbol, divs by symbol;
+
+2.
+daily = load 'NYSE_daily' as (exchange, symbol, date, open, high, low, close,
+volume, adj_close);
+divs = load 'NYSE_dividends' as (exchange, symbol, date, dividends); jnd = join daily by (symbol, date), divs by (symbol, date);
+ 
+
+

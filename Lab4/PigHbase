@@ -1,0 +1,20 @@
+$ hbase shell
+> create ‘sample_names’, ‘info’
+
+input.csv
+
+1, John, Smith 
+2, Jane, Doe 
+3, George, Washington 
+4, Ben, Franklin 
+
+./pig -x local
+
+> raw_data = LOAD ‘sample_data.csv’ USING PigStorage( ‘,’ ) AS (
+listing_id: chararray,
+fname: chararray,
+lname: chararray ); 
+
+> STORE raw_data INTO ‘hbase://sample_names’ USING
+org.apache.pig.backend.hadoop.hbase.HBaseStorage (
+‘info:fname info:lname’); 
