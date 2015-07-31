@@ -1,0 +1,48 @@
+Working with RDD
+
+1. Creating RDD's :
+
+	val lines = sc.textFile("/path/to/README.md")
+
+2. RDD Operations :
+
+	https://spark.apache.org/docs/latest/programming-guide.html
+
+	Transformation :
+		val errorsRDD = inputRDD.filter(line => line.contains("error"))
+
+	Actions :
+
+		badLinesRDD.count()
+		badLinesRDD.take(10)
+
+
+Basic Element wise transformation :
+
+	val input = sc.parallelize(List(1, 2, 3, 4)) 
+	val result = input.map(x => x * x) 
+	println(result.collect().mkString(","))
+
+
+Actions :
+
+	val sum = rdd.reduce((x, y) => x + y)
+
+
+Working with Pair RDD's 
+
+1. Creating a pair RDD :
+
+	val lines = sc.textFile("/path/to/README.md")
+	val pairs = lines.map(x => (x.split(" ")(0), x))
+
+
+Loading and Saving your data :
+
+	val input = sc.textFile("file:///home/holden/repos/spark/README.md")	
+	result.saveAsTextFile(outputFile)
+	
+
+
+
+
